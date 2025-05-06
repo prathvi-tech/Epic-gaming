@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Clone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --netflix-red: #e50914;
+            --netflix-dark: #141414;
+            --netflix-gray: #303030;
+            --netflix-light-gray: #757575;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--netflix-dark);
+            color: white;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            transition: background-color 0.3s ease;
+        }
+
+        .header.scrolled {
+            background-color: var(--netflix-dark);
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item {
+            margin-left: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            margin-left: 5px;
+        }
+
+        .profile {
+            height: 32px;
+            border-radius: 4px;
+        }
+
+        /* Hero Banner */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://assets.nflxext.com/ffe/siteui/vlv3/9d3533b2-0e2b-40b2-95e0-ecd7979cc88b/a3873901-5b7c-46eb-b9fa-12fea5197bd3/IN-en-20240311-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            max-width: 800px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .hero-cta {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .email-form {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .email-input {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 2px 0 0 2px;
+        }
+
+        .cta-button {
+            background-color: var(--netflix-red);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            font-size: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 0 2px 2px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .cta-button:hover {
+            background-color: #f40612;
+        }
+
+        .cta-button i {
+            margin-left: 10px;
+        }
+
+        /* Content Sections */
+        .content {
+            padding: 50px;
+            margin-top: -150px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        /* Row Styles */
+        .row {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px 0;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .row::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .row-item {
+            flex: 0 0 auto;
+            width: 220px;
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .row-item:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .row-item img {
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        .row-item:hover .item-info {
+            display: block;
+        }
+
+        .item-info {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--netflix-gray);
+            padding: 10px;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .item-meta {
+            display: flex;
+            font-size: 12px;
+            color: var(--netflix-light-gray);
+            margin-bottom: 5px;
+        }
+
+        .item-meta span {
+            margin-right: 10px;
+        }
+
+        .item-match {
+            color: #46d369;
+            font-weight: bold;
+        }
+
+        .item-buttons {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .item-button {
+            background-color: var(--netflix-gray);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .item-button:hover {
+            background-color: #505050;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--netflix-dark);
+            padding: 50px;
+            color: var(--netflix-light-gray);
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .social-links {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .social-link {
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .footer-link {
+            color: var(--netflix-light-gray);
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer-button {
+            background-color: transparent;
+            color: var(--netflix-light-gray);
+            border: 1px solid var(--netflix-light-gray);
+            padding: 8px 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .footer-button i {
+            margin-right: 10px;
+        }
+
+        .copyright {
+            font-size: 11px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .email-form {
+                flex-direction: column;
+            }
+            
+            .email-input {
+                border-radius: 2px;
+                margin-bottom: 10px;
+            }
+            
+            .cta-button {
+                border-radius: 2px;
+                padding: 10px;
+                justify-content: center;
+            }
+            
+            .content {
+                padding: 20px;
+                margin-top: -100px;
+            }
+            
+            .row-item {
+                width: 150px;
+            }
+            
+            .footer-links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-item:not(:last-child) {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .row-item {
+                width: 120px;
+            }
+            
+            .footer-links {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix" class="logo">
+        <nav class="nav">
+            <div class="nav-item">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="nav-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" alt="Profile" class="profile">
+                <i class="fas fa-caret-down"></i>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+        <h1 class="hero-title">Unlimited movies, TV shows and more</h1>
+        <p class="hero-subtitle">Watch anywhere. Cancel anytime.</p>
+        <p class="hero-cta">Ready to watch? Enter your email to create or restart your membership.</p>
+        <div class="email-form">
+            <input type="email" class="email-input" placeholder="Email address">
+            <button class="cta-button">Get Started <i class="fas fa-chevron-right"></i></button>
+        </div>
+    </section>
+
+    <!-- Content Sections -->
+    <div class="content">
+        <section class="section">
+            <h2 class="section-title">Popular on Netflix</h2>
+            <div class="row" id="popular-row">
+                <!-- Popular content will be loaded by JavaScript -->
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Trending Now</h2>
+            <div class="row" id="trending-row">
+                <!-- Trending content will be loaded by JavaScript -->
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Continue Watching</h2>
+            <div class="row" id="continue-row">
+                <!-- Continue watching will be loaded by JavaScript -->
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">New Releases</h2>
+            <div class="row" id="new-releases-row">
+                <!-- New releases will be loaded by JavaScript -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Audio Description</a>
+                <a href="#" class="footer-link">Help Center</a>
+                <a href="#" class="footer-link">Gift Cards</a>
+                <a href="#" class="footer-link">Media Center</a>
+                <a href="#" class="footer-link">Investor Relations</a>
+                <a href="#" class="footer-link">Jobs</a>
+                <a href="#" class="footer-link">Terms of Use</a>
+                <a href="#" class="footer-link">Privacy</a>
+                <a href="#" class="footer-link">Legal Notices</a>
+                <a href="#" class="footer-link">Cookie Preferences</a>
+                <a href="#" class="footer-link">Corporate Information</a>
+                <a href="#" class="footer-link">Contact Us</a>
+            </div>
+            <button class="footer-button">
+                <i class="fas fa-globe"></i> English
+            </button>
+            <p class="copyright">Netflix Clone - This is not the real Netflix</p>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data for movies and TV shows
+        const contentData = {
+            popular: [
+                { id: 1, title: "Stranger Things", year: 2022, match: "97%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg" },
+                { id: 2, title: "The Witcher", year: 2021, match: "95%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/8WUVHemHFH2ZIP6NWkwlHWsyrEL.jpg" },
+                { id: 3, title: "Extraction 2", year: 2023, match: "92%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/7gKI9hpEMcZUQpNgKrkDzJpbnNS.jpg" },
+                { id: 4, title: "Money Heist", year: 2021, match: "94%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg" },
+                { id: 5, title: "The Gray Man", year: 2022, match: "90%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/8cXbitsS6dWQ5gfMTZdorpAAzEH.jpg" },
+                { id: 6, title: "Squid Game", year: 2021, match: "98%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg" },
+                { id: 7, title: "Red Notice", year: 2021, match: "89%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/wdE6ewaKZHr62bLqCn7A2DiGShm.jpg" }
+            ],
+            trending: [
+                { id: 8, title: "Wednesday", year: 2022, match: "96%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/jeGtaMwGxPmQN5xM4ClnwPQcNQz.jpg" },
+                { id: 9, title: "Avatar: The Way of Water", year: 2022, match: "93%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg" },
+                { id: 10, title: "All Quiet on the Western Front", year: 2022, match: "97%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/hYqOjJ7Gh1fbqXrxlIao1g8ZehF.jpg" },
+                { id: 11, title: "The Last of Us", year: 2023, match: "99%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg" },
+                { id: 12, title: "Glass Onion", year: 2022, match: "95%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/vDGr1YdrlfbU9wxTOdpf3zChmv9.jpg" },
+                { id: 13, title: "Peaky Blinders", year: 2022, match: "94%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/6PX0r5TRRU5y0jZ70y1OtbLYmoD.jpg" },
+                { id: 14, title: "Black Panther: Wakanda Forever", year: 2022, match: "91%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/sv1xJUazXeYqALzczSZ3O6nkH75.jpg" }
+            ],
+            continue: [
+                { id: 15, title: "The Crown", year: 2022, match: "96%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/jO7PKt8fGof3rKwHhj4XCDosXQz.jpg", progress: 65 },
+                { id: 16, title: "Enola Holmes 2", year: 2022, match: "92%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/tegBpjM5ODoYoM1NjaiHVLEA0QM.jpg", progress: 30 },
+                { id: 17, title: "Outer Banks", year: 2022, match: "88%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/dsWqwCwFq5ww6WQdQxOr4uKg5vH.jpg", progress: 45 },
+                { id: 18, title: "The Sandman", year: 2022, match: "94%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/q54qEgagGOYCq5D1903eBVMNkbo.jpg", progress: 20 },
+                { id: 19, title: "Top Gun: Maverick", year: 2022, match: "97%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg", progress: 75 },
+                { id: 20, title: "House of the Dragon", year: 2022, match: "95%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/z2yahl2uefxDCl0nogcRBstwruJ.jpg", progress: 50 },
+                { id: 21, title: "Bullet Train", year: 2022, match: "89%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/tVxDe01Zy3kZqaZRNiXFGDICdZk.jpg", progress: 15 }
+            ],
+            newReleases: [
+                { id: 22, title: "You People", year: 2023, match: "85%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/x5E4TndwASNkaK2hwgeYfsIVo2x.jpg" },
+                { id: 23, title: "Pamela, a love story", year: 2023, match: "91%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/zJNEXWx3YyWGQioCbutFd5dcNYS.jpg" },
+                { id: 24, title: "That '90s Show", year: 2023, match: "87%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/fRYw0xfEFzx5pefXLYDxXCuN50J.jpg" },
+                { id: 25, title: "The Pale Blue Eye", year: 2023, match: "90%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/9qxF7gZR7oQOnqLgcZ7QdYQMUuK.jpg" },
+                { id: 26, title: "M3GAN", year: 2023, match: "93%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/d9nBoowhjiiYc4FBNtQkPY7c11H.jpg" },
+                { id: 27, title: "Vikings: Valhalla", year: 2023, match: "88%", type: "TV Show", image: "https://image.tmdb.org/t/p/w500/yz7KkREWZQeqWt1iKfYgWaLUYVH.jpg" },
+                { id: 28, title: "Your Place or Mine", year: 2023, match: "86%", type: "Movie", image: "https://image.tmdb.org/t/p/w500/ApJcd5QdYtBdw6NrLfDlQ5qYQIl.jpg" }
+            ]
+        };
+
+        // Function to create a content item
+        function createContentItem(item, showProgress = false) {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'row-item';
+            
+            let progressBar = '';
+            if (showProgress && item.progress) {
+                progressBar = `<div style="height: 4px; background: #333; margin-top: 5px;">
+                                <div style="height: 100%; width: ${item.progress}%; background: var(--netflix-red);"></div>
+                              </div>`;
+            }
+            
+            itemElement.innerHTML = `
+                <img src="${item.image}" alt="${item.title}">
+                <div class="item-info">
+                    <div class="item-buttons">
+                        <button class="item-button"><i class="fas fa-play"></i></button>
+                        <button class="item-button"><i class="fas fa-plus"></i></button>
+                        <button class="item-button"><i class="fas fa-thumbs-up"></i></button>
+                        <button class="item-button"><i class="fas fa-thumbs-down"></i></button>
+                    </div>
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-meta">
+                        <span class="item-match">${item.match}</span>
+                        <span>${item.year}</span>
+                        <span>${item.type}</span>
+                    </div>
+                    ${progressBar}
+                </div>
+            `;
+            
+            return itemElement;
+        }
+
+        // Load content into rows
+        function loadContent() {
+            const popularRow = document.getElementById('popular-row');
+            const trendingRow = document.getElementById('trending-row');
+            const continueRow = document.getElementById('continue-row');
+            const newReleasesRow = document.getElementById('new-releases-row');
+            
+            contentData.popular.forEach(item => {
+                popularRow.appendChild(createContentItem(item));
+            });
+            
+            contentData.trending.forEach(item => {
+                trendingRow.appendChild(createContentItem(item));
+            });
+            
+            contentData.continue.forEach(item => {
+                continueRow.appendChild(createContentItem(item, true));
+            });
+            
+            contentData.newReleases.forEach(item => {
+                newReleasesRow.appendChild(createContentItem(item));
+            });
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize the page
+        window.addEventListener('DOMContentLoaded', function() {
+            loadContent();
+        });
+    </script>
+</body>
+</html>
